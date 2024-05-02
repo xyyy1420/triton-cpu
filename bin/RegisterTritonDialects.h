@@ -18,7 +18,12 @@
 #include "triton/Dialect/TritonGPU/Transforms/Passes.h"
 #include "triton/Dialect/TritonNvidiaGPU/Transforms/Passes.h"
 
+<<<<<<< HEAD
 #include "nvidia/include/Dialect/NVWS/Transforms/Passes.h"
+    =======
+#include "cpu/include/TritonCPUToLLVM/Passes.h"
+#include "cpu/include/TritonToTritonCPU/Passes.h"
+    >>>>>>> 06ddafe33 (Support basic lowering through vector dialect in CPU backend.)
 #include "nvidia/include/NVGPUToLLVM/Passes.h"
 #include "nvidia/include/TritonNVIDIAGPUToLLVM/Passes.h"
 #include "triton/Conversion/TritonGPUToLLVM/Passes.h"
@@ -29,14 +34,14 @@
 #include "mlir/Dialect/LLVMIR/ROCDLDialect.h"
 #include "mlir/InitAllPasses.h"
 
-namespace mlir {
-namespace test {
-void registerTestAliasPass();
-void registerTestAlignmentPass();
-void registerTestAllocationPass();
-void registerTestMembarPass();
-void registerTestTritonAMDGPURangeAnalysis();
-} // namespace test
+    namespace mlir {
+  namespace test {
+  void registerTestAliasPass();
+  void registerTestAlignmentPass();
+  void registerTestAllocationPass();
+  void registerTestMembarPass();
+  void registerTestTritonAMDGPURangeAnalysis();
+  } // namespace test
 } // namespace mlir
 
 inline void registerTritonDialects(mlir::DialectRegistry &registry) {
@@ -81,13 +86,20 @@ inline void registerTritonDialects(mlir::DialectRegistry &registry) {
   // NVWS passes
   mlir::registerNVWSTransformsPasses();
 
+  // CPU passes
+  mlir::triton::cpu::registerTritonToTritonCPUPasses();
+  mlir::triton::cpu::registerTritonToTritonCPUPipeline();
+  mlir::triton::cpu::registerTritonCPUToLLVMPasses();
+  mlir::triton::cpu::registerTritonCPUToLLVMPipeline();
+
   registry.insert<
       mlir::triton::TritonDialect, mlir::cf::ControlFlowDialect,
       mlir::triton::cpu::TritonCPUDialect,
       mlir::triton::nvidia_gpu::TritonNvidiaGPUDialect,
       mlir::triton::gpu::TritonGPUDialect, mlir::math::MathDialect,
-      mlir::arith::ArithDialect, mlir::scf::SCFDialect, mlir::gpu::GPUDialect,
-      mlir::LLVM::LLVMDialect, mlir::NVVM::NVVMDialect,
+      mlir::arith::ArithDialect, mlir::scf::SCFDialect,
+      mlir::memref::MemRefDialect, mlir::vector::VectorDialect,
+      mlir::gpu::GPUDialect, mlir::LLVM::LLVMDialect, mlir::NVVM::NVVMDialect,
       mlir::triton::nvgpu::NVGPUDialect, mlir::triton::nvws::NVWSDialect,
       mlir::triton::amdgpu::TritonAMDGPUDialect,
       mlir::triton::proton::ProtonDialect, mlir::ROCDL::ROCDLDialect>();
