@@ -18,12 +18,9 @@
 #include "triton/Dialect/TritonGPU/Transforms/Passes.h"
 #include "triton/Dialect/TritonNvidiaGPU/Transforms/Passes.h"
 
-<<<<<<< HEAD
-#include "nvidia/include/Dialect/NVWS/Transforms/Passes.h"
-    =======
 #include "cpu/include/TritonCPUToLLVM/Passes.h"
 #include "cpu/include/TritonToTritonCPU/Passes.h"
-    >>>>>>> 06ddafe33 (Support basic lowering through vector dialect in CPU backend.)
+#include "nvidia/include/Dialect/NVWS/Transforms/Passes.h"
 #include "nvidia/include/NVGPUToLLVM/Passes.h"
 #include "nvidia/include/TritonNVIDIAGPUToLLVM/Passes.h"
 #include "triton/Conversion/TritonGPUToLLVM/Passes.h"
@@ -34,14 +31,14 @@
 #include "mlir/Dialect/LLVMIR/ROCDLDialect.h"
 #include "mlir/InitAllPasses.h"
 
-    namespace mlir {
-  namespace test {
-  void registerTestAliasPass();
-  void registerTestAlignmentPass();
-  void registerTestAllocationPass();
-  void registerTestMembarPass();
-  void registerTestTritonAMDGPURangeAnalysis();
-  } // namespace test
+namespace mlir {
+namespace test {
+void registerTestAliasPass();
+void registerTestAlignmentPass();
+void registerTestAllocationPass();
+void registerTestMembarPass();
+void registerTestTritonAMDGPURangeAnalysis();
+} // namespace test
 } // namespace mlir
 
 inline void registerTritonDialects(mlir::DialectRegistry &registry) {
