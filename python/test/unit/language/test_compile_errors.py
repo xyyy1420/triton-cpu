@@ -15,6 +15,10 @@ def format_exception(type, value, tb):
     return "\n".join(list_msg)
 
 
+def is_cpu():
+    return not is_interpreter() and triton.runtime.driver.active.get_current_target().backend == "cpu"
+
+
 def test_err_undefined_variable():
 
     @triton.jit
@@ -381,6 +385,10 @@ def test_fp8_support(fresh_triton_cache, dtype):
             supported_dtypes += [tl.float8e4nv, tl.float8e4b8, tl.float8e5b16]
         if is_hip_cdna4():
             supported_dtypes += [tl.float8e4nv]
+    elif is_interpreter():
+        supported_dtypes = [tl.float8e5, tl.float8e5b16, tl.float8e4nv, tl.float8e4b8, tl.float8e4b15]
+    elif is_cpu():
+        supported_dtypes = [tl.float8e5, tl.float8e5b16, tl.float8e4nv]
 
     @triton.jit
     def dtype_kernel(dtype: tl.constexpr):
