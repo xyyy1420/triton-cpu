@@ -346,7 +346,8 @@ void populatePatternsForOp(RewritePatternSet &patterns,
 struct MathToVecLibPass
     : public mlir::triton::cpu::impl::MathToVecLibBase<MathToVecLibPass> {
   MathToVecLibPass() = default;
-  size_t vec_size_in_bits;
+  // Default to 128-bit if no features are specified.
+  size_t vec_size_in_bits = 128;
 
   explicit MathToVecLibPass(VecLib lib, std::set<std::string> cpu_features) {
     this->lib = lib;
@@ -358,10 +359,15 @@ struct MathToVecLibPass
     //  Refactor this as an independent function.
     //  And improve this to support other x86 SIMD ISAs and also for arm SVE
     //  (VLA)
-    vec_size_in_bits = 512;
     for (auto feature : cpu_features) {
-      // Arm NEON is fixed 128-bit SIMD ISA.
-      if (feature == "neon") {
+      if (feature == "avx512f") {
+        vec_size_in_bits = std::max<size_t>(vec_size_in_bits, 512);
+      } else if (feature == "avx") {
+        vec_size_in_bits = std::max<size_t>(vec_size_in_bits, 256);
+      } else if (feature == "sse") {
+        vec_size_in_bits = std::max<size_t>(vec_size_in_bits, 128);
+      } else if (feature == "neon") {
+        // Arm NEON is fixed 128-bit SIMD ISA.
         vec_size_in_bits = 128;
         break;
       }
@@ -373,6 +379,12 @@ struct MathToVecLibPass
     MLIRContext *context = op->getContext();
 
     RewritePatternSet patterns(context);
+
+    if (!cpu_features.empty()) {
+      std::set<std::string> cpu_features_set{cpu_features.begin(),
+                                             cpu_features.end()};
+      update_vec_size(cpu_features_set);
+    }
 
     switch (lib) {
     case VecLib::Mvec: {
