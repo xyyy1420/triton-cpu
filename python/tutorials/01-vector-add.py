@@ -24,6 +24,9 @@ import triton
 import triton.language as tl
 
 DEVICE = triton.runtime.driver.active.get_active_torch_device()
+if DEVICE == torch.device("cpu:0"):
+    DEVICE = torch.device("cpu")
+
 GPU_BLOCK_SIZE = 1024
 CPU_BLOCK_SIZE = 4096
 # Single Thread Threshold
@@ -241,7 +244,7 @@ def benchmark(size, provider):
     x = torch.rand(size, device=DEVICE, dtype=torch.float32)
     y = torch.rand(size, device=DEVICE, dtype=torch.float32)
 
-    if DEVICE == 'cpu':
+    if DEVICE == torch.device('cpu'):
         triton.runtime.driver.set_active_to_cpu()
     else:
         triton.runtime.driver.set_active_to_gpu()
